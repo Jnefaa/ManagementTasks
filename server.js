@@ -31,7 +31,27 @@ app.use('/auth', authRoutes);
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
 
-io.on('connection', (socket) => {
+/*io.on('connection', (socket) => {
   console.log('Un utilisateur s’est connecté');
   socket.on('disconnect', () => console.log('Un utilisateur s’est déconnecté'));
+});*/ 
+io.on("connection", (socket) => {
+  console.log(`Utilisateur connecté : ${socket.id}`);
+
+  socket.on("newTask", (task) => {
+    io.emit("taskNotification", { type: "new", task });
+  });
+
+  socket.on("updateTask", (task) => {
+    io.emit("taskNotification", { type: "update", task });
+  });
+
+  socket.on("deleteTask", (taskId) => {
+    io.emit("taskNotification", { type: "delete", taskId });
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Utilisateur déconnecté");
+  });
 });
+
