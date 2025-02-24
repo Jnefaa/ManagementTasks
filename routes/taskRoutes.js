@@ -17,6 +17,7 @@ router.get("/status/:id", taskController.getTaskStatusById);
 router.delete("/status/:status", taskController.deleteTasksByStatus);
 router.put("/:id/status", taskController.updateTaskStatus);
 router.get("/status", taskController.getAllTaskStatuses);
+router.get("/satistics", taskController.getstatistics);
 
 
 module.exports = router;

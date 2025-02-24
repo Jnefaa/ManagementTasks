@@ -116,3 +116,43 @@ exports.updateTaskStatus = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+exports.getstatistics = async (req, res) => {
+  try {
+    const totalTasks = await Task.countDocuments();
+
+    const tasksByStatus = await Task.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]);
+
+    const tasksByUser = await Task.aggregate([
+      { $group: { _id: "$user", count: { $sum: 1 } } },
+      {
+        $lookup: {
+          from: "users", // Name of the users collection
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo"
+        }
+      },
+      {
+        $unwind: "$userInfo"
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: "$_id",
+          username: "$userInfo.username",
+          count: 1
+        }
+      }
+    ]);
+
+    res.json({ totalTasks, tasksByStatus, tasksByUser });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
